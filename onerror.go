@@ -2,7 +2,7 @@ package onerror
 
 import (
 	"fmt"
-	"io/ioutil"
+	"io"
 	"net/http"
 	"runtime"
 
@@ -14,10 +14,7 @@ import (
 func LogHTTP(err error, r *http.Response, doNotCloseBody bool) error {
 	if err != nil {
 		if r != nil {
-			log.WithFields(log.Fields{
-				"statusCode": r.StatusCode,
-				"status":     r.Status,
-			}).Error(err)
+			withStatus(r.StatusCode, r.Status).Error(err)
 		} else {
 			log.Error(err)
 		}
@@ -28,14 +25,10 @@ func LogHTTP(err error, r *http.Response, doNotCloseBody bool) error {
 		}
 
 		var b []byte
-		b, _ = ioutil.ReadAll(r.Body)
+		b, _ = io.ReadAll(r.Body)
 		msg := string(b)
 
-		log.WithFields(log.Fields{
-			"statusCode": r.StatusCode,
-			"status":     r.Status,
-			"error":      msg,
-		}).Error(r.Status)
+		withStatus(r.StatusCode, r.Status, msg).Error(err)
 		return fmt.Errorf("ERROR: %v\n\t%v", r.Status, msg)
 	}
 	return nil
@@ -45,10 +38,7 @@ func LogHTTP(err error, r *http.Response, doNotCloseBody bool) error {
 func Log(err error) {
 	if err != nil {
 		_, file, line, _ := runtime.Caller(1)
-		log.WithFields(log.Fields{
-			"caller":     file,
-			"callerLine": line,
-		}).Error(err)
+		withCaller(file, line).Error(err)
 	}
 }
 
@@ -56,14 +46,9 @@ func Log(err error) {
 func Panic(err error) {
 	if err != nil {
 		_, file, line, _ := runtime.Caller(1)
-		log.WithFields(log.Fields{
-			"caller":     file,
-			"callerLine": line,
-		}).Error(err)
-		log.WithFields(log.Fields{
-			"caller":     file,
-			"callerLine": line,
-		}).Fatal(err)
+		wc := withCaller(file, line)
+		wc.Error(err)
+		wc.Fatal(err)
 	}
 }
 
@@ -71,9 +56,11 @@ func Panic(err error) {
 func Warn(err error) {
 	if err != nil {
 		_, file, line, _ := runtime.Caller(1)
-		log.WithFields(log.Fields{
-			"caller":     file,
-			"callerLine": line,
-		}).Warn(err)
+		withCaller(file, line).Warn(err)
 	}
+}
+
+// WithEntry uses the given logrus.Entry
+func WithEntry(e *log.Entry) *Entry {
+	return &Entry{e}
 }
