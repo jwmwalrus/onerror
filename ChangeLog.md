@@ -9,6 +9,18 @@ This project uses [semantic versions](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
 
+## [0.2.0] 2022-08-31
+
+Add Entry
+
+### Added
+
+* Support for `logrus.Entry`
+
+### Modified
+
+* Upgraded dependencies
+
 ## [0.1.1] 2022-03-24
 
 Update Go version
