@@ -1,10 +1,10 @@
 module github.com/jwmwalrus/onerror
 
-go 1.18
+go 1.20
 
 require (
-	github.com/jwmwalrus/bnp v1.11.0
-	github.com/sirupsen/logrus v1.9.0
+	github.com/jwmwalrus/bnp v1.14.0
+	github.com/sirupsen/logrus v1.9.3
 )
 
-require golang.org/x/sys v0.0.0-20220829200755-d48e67d00261 // indirect
+require golang.org/x/sys v0.11.0 // indirect
